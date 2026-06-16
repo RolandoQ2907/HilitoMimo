@@ -1,0 +1,18 @@
+{
+  "name": "Hilado App",
+  "short_name": "Hilado",
+  "description": "Tu compañera de crochet y tejido",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#fdf8f4",
+  "theme_color": "#f3c6d0",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧶</text></svg>",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

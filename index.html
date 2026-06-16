@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <meta name="theme-color" content="#f3c6d0" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <title>🧶 Hilado App</title>
+  <link rel="manifest" href="manifest.json" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<div id="app">
+  <header>
+    <h1>🧶 Hilado App</h1>
+    <p>Tu compañera de crochet y tejido</p>
+  </header>
+
+  <nav>
+    <button class="active" onclick="switchTab('notas', this)">
+      <span class="nav-icon">📝</span>Notas
+    </button>
+    <button onclick="switchTab('calculo', this)">
+      <span class="nav-icon">🧮</span>Cálculo
+    </button>
+    <button onclick="switchTab('ubicaciones', this)">
+      <span class="nav-icon">📍</span>Ubicaciones
+    </button>
+  </nav>
+
+  <main>
+    <!-- ══════════════ NOTAS ══════════════ -->
+    <div id="sec-notas" class="section active">
+      <div class="sec-header">
+        <span class="sec-title">Mis lanas</span>
+        <button class="btn btn-primary btn-sm" onclick="openModal('modal-nota')">+ Nueva lana</button>
+      </div>
+      <div id="lista-notas"></div>
+    </div>
+
+    <!-- ══════════════ CALCULO ══════════════ -->
+    <div id="sec-calculo" class="section">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">💰 Calcular costo de producto</span>
+        </div>
+
+        <div class="form-group">
+          <label>Nombre del producto</label>
+          <input type="text" id="c-nombre" placeholder="Ej: Amigurumi conejo" />
+        </div>
+
+        <div class="divider"></div>
+        <p style="font-size:.78rem;font-weight:700;color:#7a6570;margin-bottom:10px;">MATERIALES</p>
+
+        <div class="form-group">
+          <label>Costo total de lana ($)</label>
+          <input type="number" id="c-lana" placeholder="0.00" min="0" step="0.01" oninput="calcular()" />
+        </div>
+        <div class="form-group">
+          <label>Cantidad de lana usada (%)</label>
+          <div class="range-row">
+            <input type="range" id="c-cantidad" min="0" max="100" value="50" oninput="document.getElementById('c-cantidad-val').textContent=this.value+'%'; calcular()">
+            <span class="range-val" id="c-cantidad-val">50%</span>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+        <p style="font-size:.78rem;font-weight:700;color:#7a6570;margin-bottom:10px;">ACCESORIOS (opcional)</p>
+
+        <div class="form-group">
+          <label>Cantidad de accesorios usados</label>
+          <input type="number" id="c-acc-cant" placeholder="0" min="0" step="1" oninput="calcular()" />
+        </div>
+        <div class="form-group">
+          <label>Precio por accesorio ($)</label>
+          <input type="number" id="c-acc-precio" placeholder="0.00" min="0" step="0.01" oninput="calcular()" />
+        </div>
+
+        <div class="divider"></div>
+        <p style="font-size:.78rem;font-weight:700;color:#7a6570;margin-bottom:10px;">TIEMPO Y GANANCIA</p>
+
+        <div class="form-group">
+          <label>Tiempo invertido (horas)</label>
+          <input type="number" id="c-tiempo" placeholder="0" min="0" step="0.5" oninput="calcular()" />
+        </div>
+        <div class="form-group">
+          <label>Valor de tu hora ($)</label>
+          <input type="number" id="c-hora" placeholder="0.00" min="0" step="0.01" oninput="calcular()" />
+        </div>
+        <div class="form-group">
+          <label>Margen de ganancia (%)</label>
+          <div class="range-row">
+            <input type="range" id="c-margen" min="0" max="200" value="30" oninput="document.getElementById('c-margen-val').textContent=this.value+'%'; calcular()">
+            <span class="range-val" id="c-margen-val">30%</span>
+          </div>
+        </div>
+
+        <div id="resultado"></div>
+
+        <button class="btn btn-secondary btn-full" style="margin-top:12px" onclick="guardarCalculo()">💾 Guardar cálculo</button>
+      </div>
+
+      <div class="sec-header" style="margin-top:8px">
+        <span class="sec-title">Cálculos guardados</span>
+      </div>
+      <div id="lista-calculos"></div>
+    </div>
+
+    <!-- ══════════════ UBICACIONES ══════════════ -->
+    <div id="sec-ubicaciones" class="section">
+      <div class="sec-header">
+        <span class="sec-title">Mis tiendas</span>
+        <button class="btn btn-primary btn-sm" onclick="openModal('modal-ubic')">+ Nueva tienda</button>
+      </div>
+      <div id="lista-ubicaciones"></div>
+    </div>
+  </main>
+</div>
+
+<!-- ══════════════ MODAL NOTA ══════════════ -->
+<div class="modal-backdrop" id="modal-nota">
+  <div class="modal">
+    <div class="card-header">
+      <span class="modal-title">🧶 Registrar lana</span>
+      <button class="btn btn-sm" onclick="closeModal('modal-nota')" style="background:#fdf8f4">✕</button>
+    </div>
+
+    <div class="form-group">
+      <label>Nombre de la lana *</label>
+      <input type="text" id="n-nombre" placeholder="Ej: Lana Merino Suave" />
+    </div>
+
+    <div class="form-group">
+      <label>Marca / Proveedor</label>
+      <input type="text" id="n-marca" placeholder="Ej: Lanería del Sur" />
+    </div>
+
+    <div class="form-group">
+      <label>Colores disponibles</label>
+      <div class="color-chips" id="chips-colores"></div>
+      <div class="color-add">
+        <input type="text" id="n-color-input" placeholder="Ej: Rosa palo" onkeydown="if(event.key==='Enter'){addColor();event.preventDefault()}" />
+        <button class="btn btn-secondary btn-sm" onclick="addColor()">+</button>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Grosor / Peso</label>
+      <select id="n-grosor">
+        <option value="">— Seleccionar —</option>
+        <option>Lace (0 – muy fino)</option>
+        <option>Super Fine / Fingering (1)</option>
+        <option>Fine / Sport (2)</option>
+        <option>Light / DK (3)</option>
+        <option>Medium / Worsted (4)</option>
+        <option>Bulky (5)</option>
+        <option>Super Bulky (6)</option>
+        <option>Jumbo (7)</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Tamaño de aguja / crochet recomendado</label>
+      <select id="n-aguja">
+        <option value="">— Seleccionar —</option>
+        <option>2.0 mm</option><option>2.25 mm</option><option>2.5 mm</option>
+        <option>2.75 mm</option><option>3.0 mm</option><option>3.25 mm</option>
+        <option>3.5 mm</option><option>3.75 mm</option><option>4.0 mm</option>
+        <option>4.5 mm</option><option>5.0 mm</option><option>5.5 mm</option>
+        <option>6.0 mm</option><option>6.5 mm</option><option>7.0 mm</option>
+        <option>8.0 mm</option><option>9.0 mm</option><option>10.0 mm</option>
+        <option>12.0 mm</option><option>15.0 mm</option><option>20.0 mm +</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Composición / Material</label>
+      <div class="tag-group" id="tag-material">
+        <label class="tag-label"><input type="checkbox" value="Acrílico" /> Acrílico</label>
+        <label class="tag-label"><input type="checkbox" value="Algodón" /> Algodón</label>
+        <label class="tag-label"><input type="checkbox" value="Lana natural" /> Lana natural</label>
+        <label class="tag-label"><input type="checkbox" value="Merino" /> Merino</label>
+        <label class="tag-label"><input type="checkbox" value="Alpaca" /> Alpaca</label>
+        <label class="tag-label"><input type="checkbox" value="Bambú" /> Bambú</label>
+        <label class="tag-label"><input type="checkbox" value="Mohair" /> Mohair</label>
+        <label class="tag-label"><input type="checkbox" value="Poliéster" /> Poliéster</label>
+        <label class="tag-label"><input type="checkbox" value="Seda" /> Seda</label>
+        <label class="tag-label"><input type="checkbox" value="Lino" /> Lino</label>
+        <label class="tag-label"><input type="checkbox" value="Mezcla" /> Mezcla</label>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Técnica / Uso</label>
+      <div class="tag-group">
+        <label class="tag-label"><input type="checkbox" value="Crochet" /> Crochet</label>
+        <label class="tag-label"><input type="checkbox" value="Tejido 2 agujas" /> Tejido 2 agujas</label>
+        <label class="tag-label"><input type="checkbox" value="Amigurumi" /> Amigurumi</label>
+        <label class="tag-label"><input type="checkbox" value="Macramé" /> Macramé</label>
+        <label class="tag-label"><input type="checkbox" value="Tapiz" /> Tapiz</label>
+        <label class="tag-label"><input type="checkbox" value="Bordado" /> Bordado</label>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Lavado / Cuidados</label>
+      <div class="tag-group">
+        <label class="tag-label"><input type="checkbox" value="Lavado a mano" /> 🤲 A mano</label>
+        <label class="tag-label"><input type="checkbox" value="Lavarropas suave" /> 🌀 Máquina suave</label>
+        <label class="tag-label"><input type="checkbox" value="No lavar" /> 🚫 No lavar</label>
+        <label class="tag-label"><input type="checkbox" value="Secar plano" /> 📐 Secar plano</label>
+        <label class="tag-label"><input type="checkbox" value="No planchar" /> 🚫🔥 No planchar</label>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Cantidad disponible (ovillos)</label>
+      <input type="number" id="n-cantidad" placeholder="0" min="0" step="1" />
+    </div>
+
+    <div class="form-group">
+      <label>Precio por ovillo ($)</label>
+      <input type="number" id="n-precio" placeholder="0.00" min="0" step="0.01" />
+    </div>
+
+    <div class="form-group">
+      <label>Notas adicionales</label>
+      <textarea id="n-notas" placeholder="Cualquier detalle extra sobre esta lana…"></textarea>
+    </div>
+
+    <button class="btn btn-primary btn-full" onclick="guardarNota()">💾 Guardar lana</button>
+  </div>
+</div>
+
+<!-- ══════════════ MODAL UBICACION ══════════════ -->
+<div class="modal-backdrop" id="modal-ubic">
+  <div class="modal">
+    <div class="card-header">
+      <span class="modal-title">📍 Agregar tienda</span>
+      <button class="btn btn-sm" onclick="closeModal('modal-ubic')" style="background:#fdf8f4">✕</button>
+    </div>
+
+    <div class="form-group">
+      <label>Nombre del local *</label>
+      <input type="text" id="u-nombre" placeholder="Ej: Lanería del Sur" />
+    </div>
+
+    <div class="form-group">
+      <label>Dirección / Ubicación</label>
+      <input type="text" id="u-direccion" placeholder="Ej: Av. Corrientes 1234, CABA" />
+    </div>
+
+    <div class="form-group">
+      <label>Link de Google Maps</label>
+      <input type="url" id="u-maps" placeholder="https://maps.google.com/..." />
+    </div>
+
+    <div class="form-group">
+      <label>¿Qué vende?</label>
+      <div class="tag-group">
+        <label class="tag-label"><input type="checkbox" value="Lanas" /> Lanas</label>
+        <label class="tag-label"><input type="checkbox" value="Agujas / Crochet" /> Agujas / Crochet</label>
+        <label class="tag-label"><input type="checkbox" value="Accesorios" /> Accesorios</label>
+        <label class="tag-label"><input type="checkbox" value="Relleno / Guata" /> Relleno</label>
+        <label class="tag-label"><input type="checkbox" value="Ojos de seguridad" /> Ojos seguridad</label>
+        <label class="tag-label"><input type="checkbox" value="Telas" /> Telas</label>
+        <label class="tag-label"><input type="checkbox" value="Online" /> 🌐 Online</label>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>URL del logo de la tienda (opcional)</label>
+      <input type="url" id="u-logo" placeholder="https://..." />
+    </div>
+
+    <div class="form-group">
+      <label>Notas</label>
+      <textarea id="u-notas" placeholder="Horarios, recomendaciones, etc."></textarea>
+    </div>
+
+    <button class="btn btn-primary btn-full" onclick="guardarUbicacion()">💾 Guardar tienda</button>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* ══════════════════════════════════════════════
+   DB  –  IndexedDB wrapper
+══════════════════════════════════════════════ */
+const DB_NAME = 'HiladoDB';
+const DB_VER  = 1;
+let db;
+
+function initDB() {
+  return new Promise((res, rej) => {
+    const req = indexedDB.open(DB_NAME, DB_VER);
+    req.onupgradeneeded = e => {
+      const d = e.target.result;
+      if (!d.objectStoreNames.contains('notas'))
+        d.createObjectStore('notas', { keyPath: 'id', autoIncrement: true });
+      if (!d.objectStoreNames.contains('ubicaciones'))
+        d.createObjectStore('ubicaciones', { keyPath: 'id', autoIncrement: true });
+      if (!d.objectStoreNames.contains('calculos'))
+        d.createObjectStore('calculos', { keyPath: 'id', autoIncrement: true });
+    };
+    req.onsuccess = e => { db = e.target.result; res(); };
+    req.onerror   = () => rej(req.error);
+  });
+}
+
+function dbAdd(store, data)   { return tx(store,'readwrite', s => s.add(data)); }
+function dbGetAll(store)      { return tx(store,'readonly',  s => s.getAll()); }
+function dbDelete(store, id)  { return tx(store,'readwrite', s => s.delete(id)); }
+
+function tx(store, mode, fn) {
+  return new Promise((res, rej) => {
+    const t = db.transaction(store, mode);
+    const req = fn(t.objectStore(store));
+    req.onsuccess = () => res(req.result);
+    req.onerror   = () => rej(req.error);
+  });
+}
+
+/* ══════════════════════════════════════════════
+   TABS
+══════════════════════════════════════════════ */
+function switchTab(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById('sec-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+/* ══════════════════════════════════════════════
+   MODAL
+══════════════════════════════════════════════ */
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+// close on backdrop click
+document.querySelectorAll('.modal-backdrop').forEach(b => {
+  b.addEventListener('click', e => { if (e.target === b) b.classList.remove('open'); });
+});
+
+/* ══════════════════════════════════════════════
+   TOAST
+══════════════════════════════════════════════ */
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+/* ══════════════════════════════════════════════
+   COLORES (chips en modal nota)
+══════════════════════════════════════════════ */
+let coloresTemp = [];
+
+function addColor() {
+  const inp = document.getElementById('n-color-input');
+  const val = inp.value.trim();
+  if (!val) return;
+  coloresTemp.push(val);
+  renderChips();
+  inp.value = '';
+  inp.focus();
+}
+
+function removeColor(i) {
+  coloresTemp.splice(i, 1);
+  renderChips();
+}
+
+function renderChips() {
+  document.getElementById('chips-colores').innerHTML =
+    coloresTemp.map((c, i) =>
+      `<span class="chip">${c}<button class="chip-del" onclick="removeColor(${i})">×</button></span>`
+    ).join('');
+}
+
+/* ══════════════════════════════════════════════
+   NOTAS
+══════════════════════════════════════════════ */
+function getChecked(containerId) {
+  return [...document.querySelectorAll(`#${containerId} input:checked`)].map(i => i.value);
+}
+
+async function guardarNota() {
+  const nombre = document.getElementById('n-nombre').value.trim();
+  if (!nombre) { toast('⚠️ El nombre es obligatorio'); return; }
+
+  const materiales = getChecked('tag-material');
+  const tecnicas   = [...document.querySelectorAll('.tag-group input:checked')].filter(i => ['Crochet','Tejido 2 agujas','Amigurumi','Macramé','Tapiz','Bordado'].includes(i.value)).map(i => i.value);
+  const cuidados   = [...document.querySelectorAll('.tag-group input:checked')].filter(i => i.value.includes('Lavado') || i.value.includes('lavar') || i.value.includes('Secar') || i.value.includes('planchar')).map(i => i.value);
+
+  const nota = {
+    nombre,
+    marca:     document.getElementById('n-marca').value.trim(),
+    colores:   [...coloresTemp],
+    grosor:    document.getElementById('n-grosor').value,
+    aguja:     document.getElementById('n-aguja').value,
+    materiales,
+    tecnicas,
+    cuidados,
+    cantidad:  document.getElementById('n-cantidad').value,
+    precio:    document.getElementById('n-precio').value,
+    notas:     document.getElementById('n-notas').value.trim(),
+    fecha:     new Date().toLocaleDateString('es-AR'),
+  };
+
+  await dbAdd('notas', nota);
+  toast('✅ Lana guardada');
+  closeModal('modal-nota');
+  resetFormNota();
+  renderNotas();
+}
+
+function resetFormNota() {
+  ['n-nombre','n-marca','n-cantidad','n-precio','n-notas'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('n-grosor').value = '';
+  document.getElementById('n-aguja').value  = '';
+  document.querySelectorAll('#modal-nota input[type=checkbox]').forEach(c => c.checked = false);
+  coloresTemp = [];
+  renderChips();
+}
+
+async function renderNotas() {
+  const notas = await dbGetAll('notas');
+  const cont  = document.getElementById('lista-notas');
+  if (!notas.length) {
+    cont.innerHTML = `<div class="empty"><div class="empty-icon">🧶</div><p>Aún no registraste ninguna lana.<br>¡Agregá la primera!</p></div>`;
+    return;
+  }
+  cont.innerHTML = notas.reverse().map(n => `
+    <div class="list-item">
+      <div class="list-item-title">${n.nombre}</div>
+      <div class="list-item-meta">${n.marca ? n.marca + ' · ' : ''}${n.fecha}${n.precio ? ' · $' + n.precio + '/ovillo' : ''}</div>
+      ${n.grosor ? `<div class="list-item-meta">Grosor: ${n.grosor}${n.aguja ? ' · Crochet: ' + n.aguja : ''}</div>` : ''}
+      <div class="list-item-tags">
+        ${n.materiales.map(m => `<span class="badge badge-lav">${m}</span>`).join('')}
+        ${n.tecnicas.map(t => `<span class="badge badge-mint">${t}</span>`).join('')}
+        ${n.colores.map(c => `<span class="badge badge-rose">🎨 ${c}</span>`).join('')}
+        ${n.cantidad ? `<span class="badge">📦 ${n.cantidad} ovillo${n.cantidad>1?'s':''}</span>` : ''}
+      </div>
+      ${n.notas ? `<div class="list-item-meta" style="margin-top:6px">💬 ${n.notas}</div>` : ''}
+      <div class="item-actions">
+        <button class="btn btn-danger btn-sm" onclick="eliminarNota(${n.id})">🗑 Eliminar</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function eliminarNota(id) {
+  await dbDelete('notas', id);
+  toast('🗑 Lana eliminada');
+  renderNotas();
+}
+
+/* ══════════════════════════════════════════════
+   CALCULO
+══════════════════════════════════════════════ */
+function calcular() {
+  const lana      = parseFloat(document.getElementById('c-lana').value)     || 0;
+  const pct       = parseFloat(document.getElementById('c-cantidad').value)  || 0;
+  const accCant   = parseFloat(document.getElementById('c-acc-cant').value)  || 0;
+  const accPrecio = parseFloat(document.getElementById('c-acc-precio').value)|| 0;
+  const horas     = parseFloat(document.getElementById('c-tiempo').value)    || 0;
+  const hora      = parseFloat(document.getElementById('c-hora').value)      || 0;
+  const margen    = parseFloat(document.getElementById('c-margen').value)    || 0;
+
+  const costoLana   = lana * (pct / 100);
+  const costoAcc    = accCant * accPrecio;
+  const costoTiempo = horas * hora;
+  const subtotal    = costoLana + costoAcc + costoTiempo;
+  const ganancia    = subtotal * (margen / 100);
+  const total       = subtotal + ganancia;
+
+  const box = document.getElementById('resultado');
+  if (total <= 0) { box.innerHTML = ''; return; }
+
+  box.innerHTML = `
+    <div class="result-box">
+      <div class="result-label">Precio de venta sugerido</div>
+      <div class="result-value">$${total.toFixed(2)}</div>
+      <div class="result-breakdown">
+        <div class="breakdown-row"><span>🧶 Lana usada (${pct}%)</span><span>$${costoLana.toFixed(2)}</span></div>
+        ${costoAcc > 0 ? `<div class="breakdown-row"><span>✨ Accesorios (${accCant})</span><span>$${costoAcc.toFixed(2)}</span></div>` : ''}
+        ${costoTiempo > 0 ? `<div class="breakdown-row"><span>⏱ Mano de obra (${horas}h)</span><span>$${costoTiempo.toFixed(2)}</span></div>` : ''}
+        <div class="breakdown-row"><span>📈 Ganancia (${margen}%)</span><span>$${ganancia.toFixed(2)}</span></div>
+        <div class="breakdown-row"><span>TOTAL</span><span>$${total.toFixed(2)}</span></div>
+      </div>
+    </div>`;
+}
+
+async function guardarCalculo() {
+  const nombre    = document.getElementById('c-nombre').value.trim() || 'Sin nombre';
+  const totalEl   = document.querySelector('.result-value');
+  if (!totalEl) { toast('⚠️ Completá los campos primero'); return; }
+
+  const lana      = parseFloat(document.getElementById('c-lana').value)     || 0;
+  const pct       = parseFloat(document.getElementById('c-cantidad').value)  || 0;
+  const accCant   = parseFloat(document.getElementById('c-acc-cant').value)  || 0;
+  const accPrecio = parseFloat(document.getElementById('c-acc-precio').value)|| 0;
+  const horas     = parseFloat(document.getElementById('c-tiempo').value)    || 0;
+  const hora      = parseFloat(document.getElementById('c-hora').value)      || 0;
+
+  const costoLana   = lana * (pct / 100);
+  const costoAcc    = accCant * accPrecio;
+  const costoTiempo = horas * hora;
+  const subtotal    = costoLana + costoAcc + costoTiempo;
+  const total       = parseFloat(totalEl.textContent.replace('$',''));
+
+  const accPrecio2 = accCant > 0 ? (costoAcc / accCant) : 0;
+  const horaPrecio  = horas   > 0 ? (costoTiempo / horas) : 0;
+
+  const datos = {
+    nombre,
+    fecha:      new Date().toLocaleDateString('es-AR'),
+    lana,
+    costoLana,
+    pct,
+    costoAcc,
+    accCant,
+    accPrecio:  accPrecio2,
+    costoTiempo,
+    horas,
+    horaPrecio,
+    subtotal,
+    total,
+  };
+
+  await dbAdd('calculos', datos);
+  toast('✅ Cálculo guardado');
+  renderCalculos();
+}
+
+async function renderCalculos() {
+  const items = await dbGetAll('calculos');
+  const cont  = document.getElementById('lista-calculos');
+  if (!items.length) {
+    cont.innerHTML = `<div class="empty"><div class="empty-icon">🧮</div><p>Aún no guardaste cálculos.</p></div>`;
+    return;
+  }
+  cont.innerHTML = items.reverse().map(c => `
+    <div class="list-item">
+      <div class="list-item-title">${c.nombre}</div>
+      <div class="list-item-meta">${c.fecha}</div>
+      <div style="font-size:1.4rem;font-weight:800;color:#3d2f35;margin-top:4px">$${c.total.toFixed(2)}</div>
+      <div class="item-actions">
+        <button class="btn btn-secondary btn-sm" onclick="generarRecibo(${c.id})">🧾 Recibo PDF</button>
+        <button class="btn btn-danger btn-sm" onclick="eliminarCalculo(${c.id})">🗑 Eliminar</button>
+      </div>
+    </div>`).join('');
+}
+
+async function eliminarCalculo(id) {
+  await dbDelete('calculos', id);
+  toast('🗑 Cálculo eliminado');
+  renderCalculos();
+}
+
+async function generarRecibo(id) {
+  const items = await dbGetAll('calculos');
+  const c = items.find(i => i.id === id);
+  if (!c) return;
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: 'mm', format: 'a5' });
+  const W = doc.internal.pageSize.getWidth();
+  const M = 10; // margen
+
+  // Colores
+  const rosa    = [243, 198, 208];
+  const menta   = [198, 232, 216];
+  const lavanda = [212, 198, 232];
+  const manteca = [247, 233, 192];
+  const crema   = [253, 248, 244];
+  const textOsc = [61,  47,  53];
+  const textSoft= [122, 101, 112];
+
+  // ── HEADER ──────────────────────────────────────
+  doc.setFillColor(...rosa);
+  doc.rect(0, 0, W, 36, 'F');
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(18);
+  doc.setTextColor(...textOsc);
+  doc.text('Presupuesto', M, 14);
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8.5);
+  doc.setTextColor(...textSoft);
+  doc.text('Nombre de Marca', M, 21);
+
+  // Nombre producto
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(12);
+  doc.setTextColor(...textOsc);
+  doc.text(c.nombre, M, 30);
+
+  // Fecha alineada a la derecha
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8);
+  doc.setTextColor(...textSoft);
+  doc.text('Fecha: ' + c.fecha, W - M, 30, { align: 'right' });
+
+  let y = 44;
+
+  // ── SECCION: MATERIALES ─────────────────────────
+  const tieneLana = c.costoLana > 0;
+  const tieneAcc  = c.costoAcc  > 0;
+  const tieneTiempo = c.costoTiempo > 0;
+
+  if (tieneLana || tieneAcc) {
+    // Subtítulo sección
+    doc.setFillColor(...lavanda);
+    doc.roundedRect(M, y, W - M*2, 7, 2, 2, 'F');
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(8);
+    doc.setTextColor(...textOsc);
+    doc.text('MATERIALES', M + 3, y + 5);
+    y += 11;
+
+    if (tieneLana) {
+      // Bloque lana
+      doc.setFillColor(...crema);
+      doc.roundedRect(M, y, W - M*2, tieneLana ? 22 : 0, 2, 2, 'F');
+
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(8.5);
+      doc.setTextColor(...textOsc);
+      doc.text('Lana / hilo', M + 3, y + 6);
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8);
+      doc.setTextColor(...textSoft);
+      doc.text('Costo total del ovillo:', M + 3, y + 12);
+      doc.text('$' + (c.lana || 0).toFixed(2), W - M - 3, y + 12, { align: 'right' });
+      doc.text(`Cantidad utilizada: ${c.pct}%`, M + 3, y + 18);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(...textOsc);
+      doc.text(`Subtotal lana: $${c.costoLana.toFixed(2)}`, W - M - 3, y + 18, { align: 'right' });
+      y += 26;
+    }
+
+    if (tieneAcc) {
+      doc.setFillColor(248, 244, 253);
+      doc.roundedRect(M, y, W - M*2, 22, 2, 2, 'F');
+
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(8.5);
+      doc.setTextColor(...textOsc);
+      doc.text('Accesorios', M + 3, y + 6);
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8);
+      doc.setTextColor(...textSoft);
+      doc.text(`Cantidad: ${c.accCant} unidad${c.accCant !== 1 ? 'es' : ''}`, M + 3, y + 12);
+      doc.text('Precio por unidad: $' + (c.accPrecio || 0).toFixed(2), M + 3, y + 18);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(...textOsc);
+      doc.text(`Subtotal accesorios: $${c.costoAcc.toFixed(2)}`, W - M - 3, y + 18, { align: 'right' });
+      y += 26;
+    }
+    y += 3;
+  }
+
+  // ── SECCION: MANO DE OBRA ───────────────────────
+  if (tieneTiempo) {
+    doc.setFillColor(...menta);
+    doc.roundedRect(M, y, W - M*2, 7, 2, 2, 'F');
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(8);
+    doc.setTextColor(...textOsc);
+    doc.text('MANO DE OBRA', M + 3, y + 5);
+    y += 11;
+
+    doc.setFillColor(...crema);
+    doc.roundedRect(M, y, W - M*2, 22, 2, 2, 'F');
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor(...textSoft);
+    doc.text(`Horas trabajadas: ${c.horas} h`, M + 3, y + 8);
+    doc.text('Valor por hora: $' + (c.horaPrecio || 0).toFixed(2), M + 3, y + 15);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...textOsc);
+    doc.text(`Subtotal mano de obra: $${c.costoTiempo.toFixed(2)}`, W - M - 3, y + 15, { align: 'right' });
+    y += 26;
+    y += 3;
+  }
+
+  // ── LINEA SUBTOTAL ──────────────────────────────
+  doc.setDrawColor(...lavanda);
+  doc.setLineWidth(0.4);
+  doc.line(M, y, W - M, y);
+  y += 5;
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8.5);
+  doc.setTextColor(...textSoft);
+  doc.text('Subtotal de costos:', M, y);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(...textOsc);
+  doc.text(`$${c.subtotal.toFixed(2)}`, W - M, y, { align: 'right' });
+  y += 10;
+
+  // ── CAJA PRECIO FINAL ───────────────────────────
+  doc.setFillColor(...manteca);
+  doc.roundedRect(M, y, W - M*2, 30, 4, 4, 'F');
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(9);
+  doc.setTextColor(...textSoft);
+  doc.text('PRECIO FINAL', W / 2, y + 9, { align: 'center' });
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(26);
+  doc.setTextColor(...textOsc);
+  doc.text(`$${c.total.toFixed(2)}`, W / 2, y + 24, { align: 'center' });
+  y += 36;
+
+  // ── NOTA AL PIE ─────────────────────────────────
+  doc.setFont('helvetica', 'italic');
+  doc.setFontSize(7);
+  doc.setTextColor(...textSoft);
+  doc.text('Este presupuesto refleja el costo real de materiales y tiempo de elaboracion artesanal.', W / 2, y + 6, { align: 'center', maxWidth: W - M*2 });
+
+  // ── GUARDAR ─────────────────────────────────────
+  const filename = `presupuesto_${c.nombre.replace(/\s+/g,'_')}_${c.fecha.replace(/\//g,'-')}.pdf`;
+  doc.save(filename);
+  toast('PDF generado!');
+}
+
+/* ══════════════════════════════════════════════
+   UBICACIONES
+══════════════════════════════════════════════ */
+async function guardarUbicacion() {
+  const nombre = document.getElementById('u-nombre').value.trim();
+  if (!nombre) { toast('⚠️ El nombre es obligatorio'); return; }
+
+  const vende = [...document.querySelectorAll('#modal-ubic input[type=checkbox]:checked')].map(i => i.value);
+
+  const ubic = {
+    nombre,
+    direccion: document.getElementById('u-direccion').value.trim(),
+    maps:      document.getElementById('u-maps').value.trim(),
+    logo:      document.getElementById('u-logo').value.trim(),
+    notas:     document.getElementById('u-notas').value.trim(),
+    vende,
+    fecha:     new Date().toLocaleDateString('es-AR'),
+  };
+
+  await dbAdd('ubicaciones', ubic);
+  toast('✅ Tienda guardada');
+  closeModal('modal-ubic');
+  resetFormUbic();
+  renderUbicaciones();
+}
+
+function resetFormUbic() {
+  ['u-nombre','u-direccion','u-maps','u-logo','u-notas'].forEach(id => document.getElementById(id).value = '');
+  document.querySelectorAll('#modal-ubic input[type=checkbox]').forEach(c => c.checked = false);
+}
+
+async function renderUbicaciones() {
+  const items = await dbGetAll('ubicaciones');
+  const cont  = document.getElementById('lista-ubicaciones');
+  if (!items.length) {
+    cont.innerHTML = `<div class="empty"><div class="empty-icon">📍</div><p>Aún no agregaste tiendas.<br>¡Guardá tu favorita!</p></div>`;
+    return;
+  }
+  cont.innerHTML = items.reverse().map(u => `
+    <div class="location-card">
+      <div class="loc-top">
+        ${u.logo ? `<img src="${u.logo}" class="location-logo" onerror="this.style.display='none'" />` : ''}
+        <div class="loc-info">
+          <div class="location-name">${u.nombre}</div>
+          ${u.direccion ? `<div class="location-meta">📌 ${u.direccion}</div>` : ''}
+        </div>
+      </div>
+      ${u.vende.length ? `<div class="list-item-tags" style="margin-top:8px">${u.vende.map(v=>`<span class="badge">${v}</span>`).join('')}</div>` : ''}
+      ${u.maps ? `<a href="${u.maps}" target="_blank" class="location-link">🗺 Ver en Google Maps</a>` : ''}
+      ${u.notas ? `<div class="location-meta" style="margin-top:6px">💬 ${u.notas}</div>` : ''}
+      <div class="item-actions">
+        <button class="btn btn-danger btn-sm" onclick="eliminarUbicacion(${u.id})">🗑 Eliminar</button>
+      </div>
+    </div>`).join('');
+}
+
+async function eliminarUbicacion(id) {
+  await dbDelete('ubicaciones', id);
+  toast('🗑 Tienda eliminada');
+  renderUbicaciones();
+}
+
+/* ══════════════════════════════════════════════
+   INIT
+══════════════════════════════════════════════ */
+initDB().then(() => {
+  renderNotas();
+  renderCalculos();
+  renderUbicaciones();
+});
+
+// Registrar Service Worker para modo offline
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').catch(() => {});
+}
+</script>
+</body>
+</html>
