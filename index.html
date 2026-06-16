@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#f3c6d0" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-  <title>🧶 Hilado App</title>
+  <title>🧶 HilitoMimo</title>
   <link rel="manifest" href="manifest.json" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <link rel="stylesheet" href="style.css" />
@@ -14,8 +14,13 @@
 <body>
 <div id="app">
   <header>
-    <h1>🧶 Hilado App</h1>
-    <p>Tu compañera de crochet y tejido</p>
+    <div>
+      <h1 class="h1-title">HilitoMimo</h1>
+      <p id="p-title">Creacion de Productos de Lana</p>
+    </div>
+    <div class="logo-container">
+      <img id="logo-img" src="logo-rb.png" alt="Logo de HilitoMimo"/>
+    </div>
   </header>
 
   <nav>
@@ -23,7 +28,7 @@
       <span class="nav-icon">📝</span>Notas
     </button>
     <button onclick="switchTab('calculo', this)">
-      <span class="nav-icon">🧮</span>Cálculo
+      <span class="nav-icon">🧮</span>Calculo
     </button>
     <button onclick="switchTab('ubicaciones', this)">
       <span class="nav-icon">📍</span>Ubicaciones
@@ -166,13 +171,27 @@
       <label>Tamaño de aguja / crochet recomendado</label>
       <select id="n-aguja">
         <option value="">— Seleccionar —</option>
-        <option>2.0 mm</option><option>2.25 mm</option><option>2.5 mm</option>
-        <option>2.75 mm</option><option>3.0 mm</option><option>3.25 mm</option>
-        <option>3.5 mm</option><option>3.75 mm</option><option>4.0 mm</option>
-        <option>4.5 mm</option><option>5.0 mm</option><option>5.5 mm</option>
-        <option>6.0 mm</option><option>6.5 mm</option><option>7.0 mm</option>
-        <option>8.0 mm</option><option>9.0 mm</option><option>10.0 mm</option>
-        <option>12.0 mm</option><option>15.0 mm</option><option>20.0 mm +</option>
+        <option>2.0 mm</option>
+        <option>2.25 mm</option>
+        <option>2.5 mm</option>
+        <option>2.75 mm</option>
+        <option>3.0 mm</option>
+        <option>3.25 mm</option>
+        <option>3.5 mm</option>
+        <option>3.75 mm</option>
+        <option>4.0 mm</option>
+        <option>4.5 mm</option>
+        <option>5.0 mm</option>
+        <option>5.5 mm</option>
+        <option>6.0 mm</option>
+        <option>6.5 mm</option>
+        <option>7.0 mm</option>
+        <option>8.0 mm</option>
+        <option>9.0 mm</option>
+        <option>10.0 mm</option>
+        <option>12.0 mm</option>
+        <option>15.0 mm</option>
+        <option>20.0 mm +</option>
       </select>
     </div>
 
@@ -436,7 +455,7 @@ async function renderNotas() {
   const notas = await dbGetAll('notas');
   const cont  = document.getElementById('lista-notas');
   if (!notas.length) {
-    cont.innerHTML = `<div class="empty"><div class="empty-icon">🧶</div><p>Aún no registraste ninguna lana.<br>¡Agregá la primera!</p></div>`;
+    cont.innerHTML = `<div class="empty"><div class="empty-icon">🧶</div><p>Aun no registraste ninguna lana.<br>!Agrega la primera!</p></div>`;
     return;
   }
   cont.innerHTML = notas.reverse().map(n => `
@@ -775,7 +794,7 @@ async function renderUbicaciones() {
   const items = await dbGetAll('ubicaciones');
   const cont  = document.getElementById('lista-ubicaciones');
   if (!items.length) {
-    cont.innerHTML = `<div class="empty"><div class="empty-icon">📍</div><p>Aún no agregaste tiendas.<br>¡Guardá tu favorita!</p></div>`;
+    cont.innerHTML = `<div class="empty"><div class="empty-icon">📍</div><p>Aun no agregaste tiendas.<br>!Guarda tu favorita!</p></div>`;
     return;
   }
   cont.innerHTML = items.reverse().map(u => `

@@ -1,3 +1,17 @@
+/* ── FONTS ──────────────────────────────────────────────── */
+@font-face {
+    font-family: 'Clayful';
+    src: url('fonts/clayful/Clayful.otf') format('opentype');
+}
+@font-face {
+    font-family: 'Maagkramp';
+    src: url('fonts/maagkramp/maagkramp.ttf') format('truetype');
+}
+@font-face {
+    font-family: 'KG';
+    src: url('fonts/kg_dark_side/KGDarkSide.ttf') format('truetype');
+}
+
 /* ── RESET ──────────────────────────────────────────────── */
 *,
 *::before,
@@ -10,7 +24,7 @@
 html,
 body {
     height: 100%;
-    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-family: 'KG', 'Segoe UI', system-ui, sans-serif;
     background: linear-gradient(to right, #f3c6d0, #fce9ed, #f3c6d0);
     color: #3d2f35;
 }
@@ -39,23 +53,41 @@ textarea {
 
 /* ── HEADER ─────────────────────────────────────────────── */
 header {
-    background: linear-gradient(135deg, #f3c6d0 0%, #d4c6e8 100%);
-    padding: 18px 20px 14px;
-    box-shadow: 0 2px 12px rgba(61, 47, 53, 0.10);
+    display: flex;
+    flex-direction: row;
+    background: linear-gradient(135deg, #ffbecc 0%, #e69aff);
+    padding: 6px 20px 14px;
+    box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.12);
     position: relative;
     z-index: 10;
+    justify-content:space-between;
+    align-items: center;
+    border-right: 4px solid #e9748d;
+    border-left: 4px solid #e9748d;
+    border-top: 4px solid #e9748d;
 }
 
 header h1 {
-    font-size: 1.5rem;
+    font-size: 1.8rem;
     font-weight: 700;
-    letter-spacing: -0.5px;
+    letter-spacing: 2px;
+    font-family: 'Clayful', 'Segoe UI', system-ui, sans-serif;
 }
 
 header p {
     font-size: 0.78rem;
     color: #7a6570;
     margin-top: 1px;
+}
+
+header logo-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0px;
+}
+#logo-img{
+    width: 95px;
 }
 
 /* ── NAV TABS ────────────────────────────────────────────── */
@@ -65,6 +97,7 @@ nav {
     border-bottom: 2px solid #f3c6d0;
     position: relative;
     z-index: 10;
+    user-select: none;
 }
 
 nav button {
@@ -80,6 +113,7 @@ nav button {
     flex-direction: column;
     align-items: center;
     gap: 3px;
+    user-select: none;
 }
 
 nav button .nav-icon {
@@ -471,8 +505,9 @@ textarea {
 }
 
 .empty p {
-    font-size: 0.88rem;
+    font-size: 1.4rem;
     user-select: none;
+    font-family: 'Maagkramp', 'Segoe UI', system-ui, sans-serif;
 }
 
 /* ── MODAL ───────────────────────────────────────────────── */
@@ -570,6 +605,7 @@ input[type=range] {
 nav-icon svg {
   pointer-events: none;
   vertical-align: middle;
+  user-select: none;
 }
 
 nav button.active .nav-icon svg {
