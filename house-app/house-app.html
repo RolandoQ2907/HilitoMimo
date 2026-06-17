@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name="theme-color" content="#d7eef7">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <title>HilitoMimo - Electrodomésticos</title>
+    <link rel="manifest" href="manifest.json">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link rel="stylesheet" href="house-style.css">
+</head>
+
+<body>
+    <div id="app">
+        <header>
+            <button class="menu-btn" onclick="toggleMenu()" aria-label="Abrir menú">☰</button>
+            <div class="header-text">
+                <h1 class="h1-title">HilitoMimo</h1>
+                <p id="p-title">Electrodomésticos</p>
+            </div>
+            <div class="logo-container">
+                <img id="logo-img" src="logo-rb.png" alt="Logo de HilitoMimo">
+            </div>
+        </header>
+
+        <nav>
+            <button class="active" onclick="switchTab('notas', this)"><span class="nav-icon">📝</span>Notas</button>
+            <button onclick="switchTab('calculo', this)"><span class="nav-icon">💰</span>Calculo</button>
+            <button onclick="switchTab('ubicaciones', this)"><span class="nav-icon">📍</span>Ubicaciones</button>
+        </nav>
+
+        <main>
+            <div id="sec-notas" class="section active">
+                <div class="sec-header">
+                    <span class="sec-title">Mis productos</span>
+                    <button class="btn btn-primary btn-sm" onclick="openModal('modal-nota')">+ Nuevo producto</button>
+                </div>
+                <div id="lista-notas"></div>
+            </div>
+
+            <div id="sec-calculo" class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Calcular precio de reventa</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Nombre del producto</label>
+                        <input type="text" id="c-nombre" placeholder="Ej. Lavarropas automático">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Marca</label>
+                        <input type="text" id="c-marca" placeholder="Ej. Samsung">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Modelo</label>
+                        <input type="text" id="c-modelo" placeholder="Ej. WW70T4020">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Estado</label>
+                        <select id="c-estado" oninput="calcular()">
+                            <option value="">Seleccionar</option>
+                            <option value="Nuevo">Nuevo</option>
+                            <option value="Usado">Usado</option>
+                            <option value="Reacondicionado">Reacondicionado</option>
+                            <option value="Con detalles">Con detalles</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Precio al que fue comprado</label>
+                        <input type="number" id="c-compra" placeholder="0.00" min="0" step="0.01" oninput="calcular()">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Gastos extra</label>
+                        <input type="number" id="c-extra" placeholder="0.00" min="0" step="0.01" oninput="calcular()">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Demanda estimada</label>
+                        <select id="c-demanda" oninput="calcular()">
+                            <option value="1">Baja</option>
+                            <option value="1.08">Media</option>
+                            <option value="1.15">Alta</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Garantía / Boleta</label>
+                        <select id="c-garantia" oninput="calcular()">
+                            <option value="1">Sin garantía</option>
+                            <option value="1.03">Con boleta</option>
+                            <option value="1.06">Con garantía</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Porcentaje de ganancia</label>
+                        <div class="range-row">
+                            <input type="range" id="c-margen" min="0" max="200" value="30"
+                                oninput="document.getElementById('c-margen-val').textContent=this.value; calcular()">
+                            <span class="range-val" id="c-margen-val">30</span>
+                        </div>
+                    </div>
+
+                    <div id="resultado"></div>
+                    <button class="btn btn-secondary btn-full" style="margin-top:12px"
+                        onclick="guardarCalculo()">Guardar cálculo</button>
+                </div>
+
+                <div class="sec-header" style="margin-top:8px">
+                    <span class="sec-title">Cálculos guardados</span>
+                </div>
+                <div id="lista-calculos"></div>
+            </div>
+
+            <div id="sec-ubicaciones" class="section">
+                <div class="sec-header">
+                    <span class="sec-title">Mis tiendas</span>
+                    <button class="btn btn-primary btn-sm" onclick="openModal('modal-ubic')">+ Nueva tienda</button>
+                </div>
+                <div id="lista-ubicaciones"></div>
+            </div>
+        </main>
+
+        <div class="modal-backdrop" id="modal-nota">
+            <div class="modal">
+                <div class="card-header">
+                    <span class="modal-title">Agregar producto</span>
+                    <button class="btn btn-sm" onclick="closeModal('modal-nota')" style="background:#fdf8f4">×</button>
+                </div>
+
+                <div class="form-group">
+                    <label>Nombre del producto *</label>
+                    <input type="text" id="n-nombre" placeholder="Ej. Lavarropas automático">
+                </div>
+
+                <div class="form-group">
+                    <label>Marca</label>
+                    <input type="text" id="n-marca" placeholder="Ej. Samsung">
+                </div>
+
+                <div class="form-group">
+                    <label>Modelo</label>
+                    <input type="text" id="n-modelo" placeholder="Ej. WW70T4020">
+                </div>
+
+                <div class="form-group">
+                    <label>Precio</label>
+                    <input type="number" id="n-precio" min="0" step="0.01" placeholder="0.00">
+                </div>
+
+                <div class="form-group">
+                    <label>Cantidad</label>
+                    <input type="number" id="n-cantidad" min="0" step="1" placeholder="1">
+                </div>
+
+                <div class="form-group">
+                    <label>Función / Estado</label>
+                    <input type="text" id="n-funcion" placeholder="Ej. Buen estado, reparado, etc.">
+                </div>
+
+                <div class="form-group">
+                    <label>Notas</label>
+                    <textarea id="n-notas" placeholder="Detalles extra"></textarea>
+                </div>
+
+                <button class="btn btn-primary btn-full" onclick="guardarNota()">Guardar producto</button>
+            </div>
+        </div>
+
+        <div class="modal-backdrop" id="modal-ubic">
+            <div class="modal">
+                <div class="card-header">
+                    <span class="modal-title">Agregar tienda</span>
+                    <button class="btn btn-sm" onclick="closeModal('modal-ubic')" style="background:#fdf8f4">×</button>
+                </div>
+                <div class="form-group">
+                    <label>Nombre del local *</label>
+                    <input type="text" id="u-nombre" placeholder="Ej. Casa del Electro">
+                </div>
+                <div class="form-group">
+                    <label>Dirección</label>
+                    <input type="text" id="u-direccion" placeholder="Ej. Av. Corrientes 1234, CABA">
+                </div>
+                <div class="form-group">
+                    <label>Ubicación de Google Maps</label>
+                    <input type="url" id="u-maps" placeholder="https://maps.google.com...">
+                </div>
+                <div class="form-group">
+                    <label>Productos que venden</label>
+                    <div class="tag-group" id="tag-productos">
+                        <label class="tag-label"><input type="checkbox"
+                                value="Electrodomésticos">Electrodomésticos</label>
+                        <label class="tag-label"><input type="checkbox" value="Pequeños electro">Pequeños
+                            electro</label>
+                        <label class="tag-label"><input type="checkbox" value="Repuestos">Repuestos</label>
+                        <label class="tag-label"><input type="checkbox" value="Accesorios">Accesorios</label>
+                        <label class="tag-label"><input type="checkbox" value="Ofertas">Ofertas</label>
+                        <label class="tag-label"><input type="checkbox" value="Online">Online</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>URL de la tienda (opcional)</label>
+                    <input type="url" id="u-logo" placeholder="https://...">
+                </div>
+                <div class="form-group">
+                    <label>Notas</label>
+                    <textarea id="u-notas" placeholder="Horarios, recomendaciones, etc."></textarea>
+                </div>
+                <button class="btn btn-primary btn-full" onclick="guardarUbicacion()">Guardar tienda</button>
+            </div>
+        </div>
+
+        <div id="menu-overlay" class="menu-overlay" onclick="closeMenu(event)">
+            <div class="menu-panel" onclick="event.stopPropagation()">
+                <div class="menu-panel-header">
+                    <span>Menú</span>
+                    <button class="menu-close" onclick="closeMenu()" aria-label="Cerrar menú">×</button>
+                </div>
+                <div class="menu-options">
+                    <button type="button" onclick="location.href='../index.html'">Hilados</button>
+                    <button type="button" onclick="location.reload()">Electrodomésticos</button>
+                    <button type="button">Gastronomía</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="toast"></div>
+    </div>
+
+    <script>
+        const DBNAME = 'ElectroDB';
+        const DBVER = 1;
+        let db;
+
+        function initDB() {
+            return new Promise((res, rej) => {
+                const req = indexedDB.open(DBNAME, DBVER);
+                req.onupgradeneeded = e => {
+                    const d = e.target.result;
+                    if (!d.objectStoreNames.contains('notas')) d.createObjectStore('notas', { keyPath: 'id', autoIncrement: true });
+                    if (!d.objectStoreNames.contains('ubicaciones')) d.createObjectStore('ubicaciones', { keyPath: 'id', autoIncrement: true });
+                    if (!d.objectStoreNames.contains('calculos')) d.createObjectStore('calculos', { keyPath: 'id', autoIncrement: true });
+                };
+                req.onsuccess = e => { db = e.target.result; res(); };
+                req.onerror = () => rej(req.error);
+            });
+        }
+
+        function tx(store, mode, fn) {
+            return new Promise((res, rej) => {
+                const t = db.transaction(store, mode);
+                const req = fn(t.objectStore(store));
+                req.onsuccess = () => res(req.result);
+                req.onerror = () => rej(req.error);
+            });
+        }
+
+        const dbAdd = (store, data) => tx(store, 'readwrite', s => s.add(data));
+        const dbGetAll = store => tx(store, 'readonly', s => s.getAll());
+        const dbDelete = (store, id) => tx(store, 'readwrite', s => s.delete(id));
+
+        function switchTab(id, btn) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+            document.getElementById('sec-' + id).classList.add('active');
+            if (btn) btn.classList.add('active');
+        }
+
+        function openModal(id) { document.getElementById(id).classList.add('open'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+        function toggleMenu() { document.getElementById('menu-overlay').classList.toggle('open'); }
+        function closeMenu(e) { if (e && e.target !== e.currentTarget) return; document.getElementById('menu-overlay').classList.remove('open'); }
+        function toast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2500); }
+
+        function getChecked(containerId) { return [...document.querySelectorAll('#' + containerId + ' input:checked')].map(i => i.value); }
+
+        function calcular() {
+            const compra = parseFloat(document.getElementById('c-compra').value || 0);
+            const extra = parseFloat(document.getElementById('c-extra').value || 0);
+            const margen = parseFloat(document.getElementById('c-margen').value || 0);
+            const demanda = parseFloat(document.getElementById('c-demanda').value || 1);
+            const garantia = parseFloat(document.getElementById('c-garantia').value || 1);
+            const base = compra + extra;
+            const ganancia = base * margen / 100;
+            const total = (base + ganancia) * demanda * garantia;
+            const box = document.getElementById('resultado');
+            if (!compra && !extra) {
+                box.innerHTML = '';
+                return;
+            }
+            box.innerHTML = `
+                <div class="result-box">
+                    <div class="result-label">Precio de venta sugerido</div>
+                    <div class="result-value">${total.toFixed(2)}</div>
+                    <div class="result-breakdown">
+                        <div class="breakdown-row"><span>Base</span><span>${base.toFixed(2)}</span></div>
+                        <div class="breakdown-row"><span>Ganancia ${margen}%</span><span>${ganancia.toFixed(2)}</span></div>
+                        <div class="breakdown-row"><span>Demanda</span><span>x${demanda}</span></div>
+                        <div class="breakdown-row"><span>Garantía</span><span>x${garantia}</span></div>
+                        <div class="breakdown-row"><span>TOTAL</span><span>${total.toFixed(2)}</span></div>
+                    </div>
+                </div>
+            `;
+        }
+
+        async function guardarNota() {
+            const nombre = document.getElementById('n-nombre').value.trim();
+            if (!nombre) return toast('El nombre es obligatorio');
+            const nota = {
+                nombre,
+                marca: document.getElementById('n-marca').value.trim(),
+                modelo: document.getElementById('n-modelo').value.trim(),
+                precio: document.getElementById('n-precio').value,
+                cantidad: document.getElementById('n-cantidad').value,
+                funcion: document.getElementById('n-funcion').value.trim(),
+                notas: document.getElementById('n-notas').value.trim(),
+                fecha: new Date().toLocaleDateString('es-AR')
+            };
+            await dbAdd('notas', nota);
+            closeModal('modal-nota');
+            toast('Producto guardado');
+            renderNotas();
+        }
+
+        async function renderNotas() {
+            const notas = await dbGetAll('notas');
+            const cont = document.getElementById('lista-notas');
+            if (!notas.length) {
+                cont.innerHTML = `<div class="empty"><div class="empty-icon">⚡</div><p>Aún no registraste ningún producto.<br>Agrega el primero!</p></div>`;
+                return;
+            }
+            cont.innerHTML = notas.reverse().map(n => `<div class="list-item"><div class="list-item-title">${n.nombre}</div><div class="list-item-meta">${n.marca ? n.marca + ' • ' : ''}${n.modelo ? n.modelo + ' • ' : ''}${n.fecha}${n.precio ? ' • $' + n.precio : ''}${n.cantidad ? ' • Cant: ' + n.cantidad : ''}</div><div class="list-item-tags">${n.funcion ? `<span class="badge badge-lav">${n.funcion}</span>` : ''}</div>${n.notas ? `<div class="list-item-meta" style="margin-top:6px">${n.notas}</div>` : ''}<div class="item-actions"><button class="btn btn-danger btn-sm" onclick="eliminarNota(${n.id})">Eliminar</button></div></div>`).join('');
+        }
+        async function eliminarNota(id) { await dbDelete('notas', id); toast('Producto eliminado'); renderNotas(); }
+
+        async function guardarCalculo() {
+            const nombre = document.getElementById('c-nombre').value.trim();
+            const marca = document.getElementById('c-marca').value.trim();
+            const modelo = document.getElementById('c-modelo').value.trim();
+            const estado = document.getElementById('c-estado').value;
+            const compra = parseFloat(document.getElementById('c-compra').value || 0);
+            const extra = parseFloat(document.getElementById('c-extra').value || 0);
+            const margen = parseFloat(document.getElementById('c-margen').value || 0);
+            const demanda = parseFloat(document.getElementById('c-demanda').value || 1);
+            const garantia = parseFloat(document.getElementById('c-garantia').value || 1);
+
+            if (!nombre) return toast('El nombre es obligatorio');
+
+            const base = compra + extra;
+            const ganancia = base * margen / 100;
+            const total = (base + ganancia) * demanda * garantia;
+
+            await dbAdd('calculos', {
+                nombre,
+                marca,
+                modelo,
+                estado,
+                compra,
+                extra,
+                margen,
+                demanda,
+                garantia,
+                base,
+                ganancia,
+                total,
+                fecha: new Date().toLocaleDateString('es-AR')
+            });
+
+            toast('Cálculo guardado');
+            renderCalculos();
+        }
+
+        async function renderCalculos() {
+            const items = await dbGetAll('calculos');
+            const cont = document.getElementById('lista-calculos');
+            if (!items.length) {
+                cont.innerHTML = `<div class="empty"><div class="empty-icon">📄</div><p>Aún no guardaste cálculos.</p></div>`;
+                return;
+            }
+            cont.innerHTML = items.reverse().map(c => `<div class="list-item"><div class="list-item-title">${c.nombre}</div><div class="list-item-meta">${c.fecha}</div><div style="font-size:1.4rem;font-weight:800;color:#3d2f35;margin-top:4px">${Number(c.total || 0).toFixed(2)}</div><div class="item-actions"><button class="btn btn-secondary btn-sm" onclick="generarRecibo(${c.id})">Factura PDF</button><button class="btn btn-danger btn-sm" onclick="eliminarCalculo(${c.id})">Eliminar</button></div></div>`).join('');
+        }
+        async function eliminarCalculo(id) { await dbDelete('calculos', id); toast('Cálculo eliminado'); renderCalculos(); }
+
+        async function generarRecibo(id) {
+            const items = await dbGetAll('calculos');
+            const c = items.find(i => i.id === id);
+            if (!c) return;
+
+            const jsPDF = window.jspdf.jsPDF;
+            const doc = new jsPDF({ unit: 'mm', format: 'a5' });
+
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(18);
+            doc.text('Factura / Presupuesto', 10, 15);
+
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'normal');
+            doc.text('Producto: ' + (c.nombre || ''), 10, 26);
+            doc.text('Marca: ' + (c.marca || ''), 10, 33);
+            doc.text('Modelo: ' + (c.modelo || ''), 10, 40);
+            doc.text('Estado: ' + (c.estado || ''), 10, 47);
+            doc.text('Fecha: ' + (c.fecha || ''), 10, 54);
+            doc.text('Precio compra: ' + Number(c.compra || 0).toFixed(2), 10, 61);
+            doc.text('Gastos extra: ' + Number(c.extra || 0).toFixed(2), 10, 68);
+            doc.text('Margen: ' + (c.margen || 0) + '%', 10, 75);
+            doc.text('Demanda: x' + (c.demanda || 1), 10, 82);
+            doc.text('Garantía: x' + (c.garantia || 1), 10, 89);
+
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(14);
+            doc.text('TOTAL: ' + Number(c.total || 0).toFixed(2), 10, 100);
+
+            doc.save('factura-' + String(c.nombre || 'producto').replace(/\s+/g, '-') + '.pdf');
+            toast('PDF generado');
+        }
+
+        async function guardarUbicacion() {
+            const nombre = document.getElementById('u-nombre').value.trim();
+            if (!nombre) return toast('El nombre es obligatorio');
+            const ubic = {
+                nombre,
+                direccion: document.getElementById('u-direccion').value.trim(),
+                maps: document.getElementById('u-maps').value.trim(),
+                url: document.getElementById('u-logo').value.trim(),
+                notas: document.getElementById('u-notas').value.trim(),
+                vende: getChecked('tag-productos'),
+                fecha: new Date().toLocaleDateString('es-AR')
+            };
+            await dbAdd('ubicaciones', ubic);
+            closeModal('modal-ubic');
+            toast('Tienda guardada');
+            renderUbicaciones();
+        }
+
+        async function renderUbicaciones() {
+            const items = await dbGetAll('ubicaciones');
+            const cont = document.getElementById('lista-ubicaciones');
+            if (!items.length) {
+                cont.innerHTML = `<div class="empty"><div class="empty-icon">📍</div><p>Aún no agendaste ninguna tienda.<br>Agregá la primera!</p></div>`;
+                return;
+            }
+
+            cont.innerHTML = items.reverse().map(u => `
+                <div class="location-card">
+                    <div class="loc-top">
+                        <div class="loc-info">
+                            <div class="location-name">${u.nombre}</div>
+                            ${u.direccion ? `<div class="location-meta">${u.direccion}</div>` : ''}
+                        </div>
+                    </div>
+                    ${u.vende?.length ? `<div class="list-item-tags" style="margin-top:8px">${u.vende.map(v => `<span class="badge">${v}</span>`).join('')}</div>` : ''}
+                    ${u.maps ? `<a href="${u.maps}" target="_blank" rel="noopener noreferrer" class="location-link">Ver en Google Maps</a>` : ''}
+                    ${u.url ? `<a href="${u.url}" target="_blank" rel="noopener noreferrer" class="location-link">Abrir tienda</a>` : ''}
+                    ${u.notas ? `<div class="location-meta" style="margin-top:6px">${u.notas}</div>` : ''}
+                    <div class="item-actions">
+                        <button class="btn btn-danger btn-sm" onclick="eliminarUbicacion(${u.id})">Eliminar</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        async function eliminarUbicacion(id) { await dbDelete('ubicaciones', id); toast('Tienda eliminada'); renderUbicaciones(); }
+
+        document.querySelectorAll('.modal-backdrop').forEach(b => b.addEventListener('click', e => { if (e.target === b) b.classList.remove('open'); }));
+
+        initDB().then(() => { renderNotas(); renderCalculos(); renderUbicaciones(); });
+        if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => { });
+    </script>
+</body>
+
+</html>
