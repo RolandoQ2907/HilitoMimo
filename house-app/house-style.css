@@ -1,15 +1,15 @@
 /* ── FONTS ──────────────────────────────────────────────── */
 @font-face {
     font-family: 'Clayful';
-    src: url('fonts/clayful/Clayful.otf') format('opentype');
+    src: url('../fonts/clayful/Clayful.otf') format('opentype');
 }
 @font-face {
     font-family: 'Maagkramp';
-    src: url('fonts/maagkramp/maagkramp.ttf') format('truetype');
+    src: url('../fonts/maagkramp/maagkramp.ttf') format('truetype');
 }
 @font-face {
     font-family: 'KG';
-    src: url('fonts/kg_dark_side/KGDarkSide.ttf') format('truetype');
+    src: url('../fonts/kg_dark_side/KGDarkSide.ttf') format('truetype');
 }
 
 /* ── RESET ──────────────────────────────────────────────── */
@@ -25,8 +25,8 @@ html,
 body {
     height: 100%;
     font-family: 'KG', 'Segoe UI', system-ui, sans-serif;
-    background: linear-gradient(to right, #f3c6d0, #fce9ed, #f3c6d0);
-    color: #3d2f35;
+    background: linear-gradient(to right, #9a9af6, #e6d8ff, #9a9af6);
+    color: #0d1632;
 }
 
 button {
@@ -55,16 +55,16 @@ textarea {
 header {
     display: flex;
     flex-direction: row;
-    background: linear-gradient(135deg, #ffbecc 0%, #e69aff);
-    padding: 6px 20px 14px;
+    background: linear-gradient(135deg, #abf6fe, #8cfad0);
+    padding: 6px 14px 14px;
     box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.12);
     position: relative;
     z-index: 10;
-    justify-content:space-between;
+    justify-content: space-between;
     align-items: center;
-    border-right: 4px solid #e9748d;
-    border-left: 4px solid #e9748d;
-    border-top: 4px solid #e9748d;
+    border-right: 4px solid #324521;
+    border-left: 4px solid #324521;
+    border-top: 4px solid #324521;
 }
 
 header h1 {
@@ -76,40 +76,27 @@ header h1 {
 
 header p {
     font-size: 0.78rem;
-    color: #7a6570;
+    color: #236f3b;
     margin-top: 1px;
 }
 
-header logo-container {
+.logo-container {
     display: flex;
     align-items: center;
     justify-content: center;
     margin: 0px;
 }
-#logo-img{
+
+#logo-img {
     width: 95px;
-}
-header {
-    display: flex;
-    flex-direction: row;
-    background: linear-gradient(135deg, #ffbecc 0%, #e69aff);
-    padding: 6px 14px 14px;
-    box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.12);
-    position: relative;
-    z-index: 10;
-    justify-content: space-between;
-    align-items: center;
-    border-right: 4px solid #e9748d;
-    border-left: 4px solid #e9748d;
-    border-top: 4px solid #e9748d;
 }
 
 .menu-btn {
     width: 38px;
     height: 38px;
     border-radius: 10px;
-    background: rgba(255,255,255,0.55);
-    color: #3d2f35;
+    background: rgba(255, 255, 255, 0.55);
+    color: #102546;
     font-size: 1.2rem;
     font-weight: 700;
 }
@@ -137,9 +124,9 @@ header {
     width: 240px;
     max-width: 85vw;
     height: 100%;
-    background: #fdf8f4;
+    background: #e5f3ff;
     padding: 16px;
-    box-shadow: 4px 0 18px rgba(0,0,0,0.18);
+    box-shadow: 4px 0 18px rgba(0, 0, 0, 0.18);
     animation: slideMenu .2s ease;
 }
 
@@ -160,8 +147,8 @@ header {
     width: 34px;
     height: 34px;
     border-radius: 10px;
-    background: #f8d7da;
-    color: #842029;
+    background: #00bfff;
+    color: #d6fff2;
     font-size: 1.4rem;
     line-height: 1;
 }
@@ -175,19 +162,19 @@ header {
 .menu-options button {
     padding: 12px 14px;
     border-radius: 12px;
-    background: #ffffff;
-    border: 1.5px solid #e8dde0;
+    background: #f2fdff;
+    border: 1.5px solid #016b75;
     text-align: left;
     font-size: 0.95rem;
     font-weight: 600;
-    color: #3d2f35;
+    color: #013924;
 }
 
 /* ── NAV TABS ────────────────────────────────────────────── */
 nav {
     display: flex;
     background: #ffffff;
-    border-bottom: 2px solid #f3c6d0;
+    border-bottom: 2px solid #6dc0a0;
     position: relative;
     z-index: 10;
     user-select: none;
@@ -198,7 +185,7 @@ nav button {
     padding: 12px 0 10px;
     font-size: 0.75rem;
     font-weight: 600;
-    color: #7a6570;
+    color: #7d8d9a;
     background: transparent;
     border-bottom: 3px solid transparent;
     transition: all .2s;
@@ -214,8 +201,8 @@ nav button .nav-icon {
 }
 
 nav button.active {
-    color: #3d2f35;
-    border-bottom-color: #e8a0b0;
+    color: #241434;
+    border-bottom-color: #2d7544;
 }
 
 /* ── MAIN CONTENT ───────────────────────────────────────── */
@@ -223,8 +210,12 @@ main {
     flex: 1;
     overflow-y: auto;
     padding: 16px;
-    border-right: 4px solid #e9748d;
-    border-left: 4px solid #e9748d;
+    border-right: 4px solid #2f1a6a;
+    border-left: 4px solid #2f1a6a;
+    background-image: url('../house-app/elec-logo.png');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 350px;
 }
 
 .section {
@@ -273,7 +264,7 @@ label {
     display: block;
     font-size: 0.78rem;
     font-weight: 600;
-    color: #7a6570;
+    color: #380b59;
     margin-bottom: 5px;
 }
 
@@ -284,10 +275,10 @@ select,
 textarea {
     width: 100%;
     padding: 10px 12px;
-    border: 1.5px solid #e8dde0;
+    border: 1.5px solid #334160;
     border-radius: 10px;
     font-size: 0.9rem;
-    color: #3d2f35;
+    color: #4c799c;
     background: #fdf8f4;
     transition: border-color .2s;
     outline: none;
@@ -296,8 +287,8 @@ textarea {
 input:focus,
 select:focus,
 textarea:focus {
-    border-color: #e8a0b0;
-    background: #ffffff;
+    border-color: #009dff;
+    background: #f0feff;
 }
 
 textarea {
@@ -317,7 +308,7 @@ textarea {
     align-items: center;
     gap: 5px;
     background: #fdf8f4;
-    border: 1.5px solid #e0d8dd;
+    border: 1.5px solid #dae6f0;
     border-radius: 20px;
     padding: 5px 11px;
     font-size: 0.78rem;
@@ -359,7 +350,7 @@ textarea {
     cursor: pointer;
     font-size: 1rem;
     line-height: 1;
-    color: #7a6570;
+    color: #6e657a;
 }
 
 .color-add {
@@ -385,21 +376,22 @@ textarea {
 }
 
 .btn-primary {
-    background: #e8a0b0;
-    color: #ffffff;
+    background: #adf672;
+    color: #4e732d;
 }
 
 .btn-primary:hover {
-    background: #d4849a;
+    background: #32a545;
+    color: #e2ffc9;
 }
 
 .btn-secondary {
     background: #c6e8d8;
-    color: #3d2f35;
+    color: #2f3d36;
 }
 
 .btn-secondary:hover {
-    background: #9ed4bc;
+    background: #6fa28b;
 }
 
 .btn-danger {
@@ -438,7 +430,7 @@ textarea {
 
 .list-item-meta {
     font-size: 0.78rem;
-    color: #7a6570;
+    color: #657a6c;
 }
 
 .list-item-tags {
@@ -449,7 +441,7 @@ textarea {
 }
 
 .badge {
-    background: #f7e9c0;
+    background: #ffbf00;
     border-radius: 20px;
     padding: 2px 9px;
     font-size: 0.72rem;
@@ -475,10 +467,11 @@ textarea {
 }
 
 /* ── SECTION HEADER ─────────────────────────────────────── */
-.h1-title{
+.h1-title {
     user-select: none;
 }
-#p-title{
+
+#p-title {
     user-select: none;
 }
 
@@ -589,7 +582,7 @@ textarea {
 .empty {
     text-align: center;
     padding: 40px 20px;
-    color: #7a6570;
+    color: #43204a;
 }
 
 .empty-icon {
@@ -633,7 +626,6 @@ textarea {
     from {
         transform: translateY(100%);
     }
-
     to {
         transform: translateY(0);
     }
@@ -679,7 +671,7 @@ textarea {
 /* ── RANGE INPUT ─────────────────────────────────────────── */
 input[type=range] {
     width: 100%;
-    accent-color: #e8a0b0;
+    accent-color: #d4e8a0;
 }
 
 .range-row {
@@ -696,15 +688,87 @@ input[type=range] {
 }
 
 nav-icon svg {
-  pointer-events: none;
-  vertical-align: middle;
-  user-select: none;
+    pointer-events: none;
+    vertical-align: middle;
+    user-select: none;
 }
 
 nav button.active .nav-icon svg {
-  stroke: #3d2f35;
+    stroke: #3d2f35;
 }
 
 nav button .nav-icon svg {
-  stroke: #7a6570;
+    stroke: #7a6570;
+}
+
+/* ── HOUSE APP OVERRIDES (Electrodomésticos - Colores Tech Pastel) ───────────────────────────────── */
+.house-app html,
+.house-app body {
+    background: linear-gradient(to right, #d7eef7, #ecf8fb, #d7eef7);
+}
+
+.house-app header {
+    background: linear-gradient(135deg, #cfeaf5 0%, #d8d4ff 100%);
+    border-right: 4px solid #7aaec4;
+    border-left: 4px solid #7aaec4;
+    border-top: 4px solid #7aaec4;
+}
+
+.house-app nav {
+    border-bottom: 2px solid #cfeaf5;
+}
+
+.house-app nav button.active {
+    border-bottom-color: #7aaec4;
+}
+
+.house-app .btn-primary {
+    background: #8ecae6;
+}
+
+.house-app .btn-primary:hover {
+    background: #73b9d8;
+}
+
+.house-app .btn-secondary {
+    background: #d9f2ea;
+}
+
+.house-app .btn-secondary:hover {
+    background: #bfe9db;
+}
+
+.house-app .badge-mint {
+    background: #d9f2ea;
+}
+
+.house-app .badge-lav {
+    background: #d8d4ff;
+}
+
+.house-app .badge-rose {
+    background: #d7eef7;
+}
+
+.house-app .card,
+.house-app .list-item,
+.house-app .location-card {
+    box-shadow: 0 2px 12px rgba(61, 47, 53, 0.08);
+}
+
+.house-app .result-box {
+    background: linear-gradient(135deg, #d9f2ea 0%, #d8d4ff 100%);
+}
+
+.house-app .menu-btn,
+.house-app .menu-close {
+    background: rgba(255, 255, 255, 0.6);
+}
+
+.house-app .menu-panel {
+    background: #f7fcfe;
+}
+
+.house-app .menu-options button {
+    border-color: #d7eef7;
 }
